@@ -14,14 +14,12 @@ type Flags struct {
 	Version  bool
 }
 
-const VersionInfo string = "v0.0.1"
-
 var (
 	flags  = Flags{}
 	config *ServiceConfig
 )
 
-func Initialize(conf_path string) {
+func Initialize(conf_path string, version string) {
 	var err error
 
 	flag.StringVar(&flags.ConfFile, "c", conf_path, "path to config file")
@@ -30,7 +28,7 @@ func Initialize(conf_path string) {
 	flag.Parse()
 
 	if flags.Version {
-		fmt.Println(VersionInfo)
+		fmt.Println(version)
 		os.Exit(0)
 	}
 

@@ -16,7 +16,7 @@ func main() {
 }
 
 func daemon_up(config string) error {
-	service.Initialize(config)
+	service.Initialize(config, VersionInfo.Version)
 
 	stats.Init()
 
