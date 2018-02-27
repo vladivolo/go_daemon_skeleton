@@ -1,0 +1,17 @@
+#/etc/systemd/system/daemon-name.service
+
+[Unit]
+Description=Skeleton server
+After=network.target
+
+[Service]
+WorkingDirectory=/path/to/server/
+Environment=
+User=user
+SyslogIdentifier=
+PIDFile=/path/to/pid-file.pid
+ExecStart=/path/to/server/daemon-name -c /path/to/config/config.yaml -
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

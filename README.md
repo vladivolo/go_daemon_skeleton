@@ -1,2 +1,8 @@
 # go_daemon_skeleton
-Sceleton of go daemon with yaml config, http server, input/output redis queue.
+Go daemon skeleton with:
+- yaml config
+- logs
+- signals
+- http server
+- generate version
+- requests stats

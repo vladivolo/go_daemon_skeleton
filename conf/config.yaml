@@ -1,0 +1,12 @@
+name: daemon-name
+listen: 0.0.0.0:8080
+http_workers_count:       10
+pgx:   postgres://user:password@localhost:5432/dbname
+input_queue: tcp@127.0.0.1:6379/1/input-queue
+output_queue: tcp@127.0.0.1:6379/1/output-queue
+logfile: /var/log/daemon.log
+loglevel: "DEBUG"
+storage:
+   - path: /tmp/storage/vol111
+     enable: true
+   - {path: /tmp/storage/vol2, enable: true}
