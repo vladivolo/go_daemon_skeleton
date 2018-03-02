@@ -15,7 +15,7 @@ type StatsType struct {
 	HttpUnknownRequests int64
 }
 
-func Init() {
+func init() {
 	stats.Tm_start = time.Now()
 }
 

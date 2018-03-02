@@ -18,8 +18,6 @@ func main() {
 func daemon_up(config string) error {
 	service.Initialize(config, VersionInfo.Version)
 
-	stats.Init()
-
 	StartHttpServer(service.ServiceConf().GetListen(), service.ServiceConf().GetHttpWorkersCount())
 
 	log.Info("Start Daemon: %v", service.ServiceConf())

@@ -1,5 +1,5 @@
 # go_daemon_skeleton
-Go daemon skeleton with:
+Go (Golang) daemon (Microservice) skeleton with:
 - yaml config
 - logs
 - signals
