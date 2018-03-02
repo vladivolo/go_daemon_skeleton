@@ -22,10 +22,22 @@ type ResponseVersion struct {
 	BuildCommand   string
 }
 
+type RequestHandlerInfo struct {
+	get_handler    func(*fasthttp.RequestCtx)
+	post_handler   func(*fasthttp.RequestCtx)
+	delete_handler func(*fasthttp.RequestCtx)
+}
+
 var (
 	workersCloser []io.Closer
 	VersionInfo   ResponseVersion
 )
+
+var Handlers = map[string]RequestHandlerInfo{
+	"/ping":          RequestHandlerInfo{GetPing, PostPing, nil},
+	"/service/stats": RequestHandlerInfo{GetStats, nil, nil},
+	"/version":       RequestHandlerInfo{GetVersion, nil, nil},
+}
 
 func StartHttpServer(addr string, workers_count int) {
 	for i := 0; i < workers_count; i++ {
@@ -46,18 +58,29 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 	ctx.Response.Header.Set("daemon-api-version", "1.0")
 
-	switch string(ctx.Path()) {
-	case "/ping":
-		PingHandler(ctx)
-	case "/service/stats":
-		StatsHandler(ctx)
-	case "/version", "/version/": // it's better to configure the redirect in nginx
-		VersionHandler(ctx)
-	default:
-		stats.HttpUnknownRequestsInc()
-		ctx.Error("Not found", fasthttp.StatusNotFound)
-		return
+	r, ok := Handlers[string(ctx.Path())]
+	if ok == true {
+		switch string(ctx.Method()) {
+		case "GET":
+			if r.get_handler != nil {
+				r.get_handler(ctx)
+				return
+			}
+		case "POST":
+			if r.post_handler != nil {
+				r.post_handler(ctx)
+				return
+			}
+		case "DELETE":
+			if r.delete_handler != nil {
+				r.delete_handler(ctx)
+				return
+			}
+		}
 	}
+
+	stats.HttpUnknownRequestsInc()
+	ctx.Error("Not found", fasthttp.StatusNotFound)
 }
 
 func listen(addr string) io.Closer {
@@ -74,24 +97,10 @@ func listen(addr string) io.Closer {
 		if err = s.Serve(ln); err != nil {
 			log.Fatal("error in fasthttp Server: %s", err)
 		}
-		log.Info("fasthttp.Serve: EXIT")
+		log.Info("fasthttp.Serve(): EXIT")
 	}()
 
 	return ln
-}
-
-func PingHandler(ctx *fasthttp.RequestCtx) {
-	log.Debug("PingHandler() User-Agent: %s RemoteAddr %s", ctx.UserAgent(), ctx.RemoteAddr())
-
-	switch string(ctx.Method()) {
-	case "POST":
-		PostPing(ctx)
-	case "GET":
-		GetPing(ctx)
-	default:
-	}
-
-	return
 }
 
 func PostPing(ctx *fasthttp.RequestCtx) {
@@ -104,7 +113,7 @@ func GetPing(ctx *fasthttp.RequestCtx) {
 	ctx.SetStatusCode(fasthttp.StatusOK)
 }
 
-func StatsHandler(ctx *fasthttp.RequestCtx) {
+func GetStats(ctx *fasthttp.RequestCtx) {
 	r, err := stats.Stats()
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
@@ -114,13 +123,12 @@ func StatsHandler(ctx *fasthttp.RequestCtx) {
 	ctx.SetStatusCode(fasthttp.StatusOK)
 }
 
-func VersionHandler(ctx *fasthttp.RequestCtx) {
-	if bin, err := json.Marshal(VersionInfo); err != nil {
+func GetVersion(ctx *fasthttp.RequestCtx) {
+	bin, err := json.Marshal(VersionInfo)
+	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
-	} else {
-		fmt.Fprintf(ctx, string(bin))
-		ctx.SetStatusCode(fasthttp.StatusOK)
-		return
 	}
+	fmt.Fprintf(ctx, string(bin))
+	ctx.SetStatusCode(fasthttp.StatusOK)
 }
