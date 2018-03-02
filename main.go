@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/vladivolo/go_daemon_skeleton/service"
-	"github.com/vladivolo/go_daemon_skeleton/stats"
 	log "github.com/vladivolo/lumber"
 	"os"
 )
