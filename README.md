@@ -5,4 +5,7 @@ Go daemon skeleton with:
 - signals
 - http server
 - generate version
-- requests stats
+- http requests stat
+
+TODO:
+- redis queue send/receive
