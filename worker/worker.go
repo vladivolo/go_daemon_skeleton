@@ -1,9 +1,9 @@
 package worker
 
 import (
+	"github.com/vladivolo/go_daemon_skeleton/lib/queue"
+	"github.com/vladivolo/go_daemon_skeleton/lib/redis"
 	log "github.com/vladivolo/lumber"
-	"lrs/lib/queue"
-	"lrs/lib/redis"
 	"sync/atomic"
 )
 
