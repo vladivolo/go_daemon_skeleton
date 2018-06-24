@@ -6,6 +6,8 @@ Go (Golang) daemon (Microservice) skeleton with:
 - http server
 - generate version
 - http requests stat
+- redis queue send/receive
+- workers pool
 
 TODO:
-- redis queue send/receive
+- 
